@@ -1,1 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For You 💗</title>
 
+<style>
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  min-height:100%;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  overflow-x:hidden;
+  color:#5b1830;
+  background:linear-gradient(135deg,#ffd6e0,#fff0f5,#ffc2d1);
+}
+
+button{
+  border:0;
+  cursor:pointer;
+  font-family:inherit;
+}
+
+.page{
+  width:100%;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:25px 15px;
+  position:relative;
+  z-index:5;
+}
+
+.card{
+  width:100%;
+  max-width:650px;
+  padding:28px 20px;
+  text-align:center;
+  background:rgba(255,255,255,.78);
+  border-radius:28px;
+  box-shadow:0 15px 45px rgba(120,20,60,.18);
+  backdrop-filter:blur(10px);
+}
+
+h1{
+  font-size:clamp(30px,8vw,50px);
+  margin:10px 0;
+}
+
+h2{
+  font-size:clamp(24px,6vw,34px);
+}
+
+p{
+  font-size:17px;
+  line-height:1.7;
+}
+
+.main-heart{
+  font-size:80px;
+  animation:beat 1.2s infinite;
+}
+
+.btn{
+  padding:14px 25px;
+  margin:8px;
+  border-radius:30px;
+  background:#ff4f81;
+  color:white;
+  font-size:16px;
+  box-shadow:0 7px 18px rgba(255,79,129,.25);
+}
+
+.btn:active{
+  transform:scale(.94);
+}
+
+.secondary{
+  background:#ff9fba;
+}
+
+#gameArea{
+  min-height:250px;
+}
+
+.progress{
+  width:100%;
+  height:8px;
+  background:#ffd9e3;
+  border-radius:20px;
+  overflow:hidden;
+  margin:15px 0 25px;
+}
+
+.progressBar{
+  height:100%;
+  width:0%;
+  background:#ff4f81;
+  transition:.4s;
+}
+
+.top{
+  font-size:14px;
+  opacity:.7;
+}
+
+.gameButton{
+  font-size:45px;
+  background:none;
+  padding:20px;
+}
+
+.memory{
+  display:grid;
+  grid-template-columns:repeat(4,65px);
+  justify-content:center;
+  gap:9px;
+  margin:20px auto;
+}
+
+.memory button{
+  width:65px;
+  height:65px;
+  border-radius:14px;
+  background:#ffb6ca;
+  font-size:28px;
+}
+
+.catchArea{
+  height:320px;
+  position:relative;
+  overflow:hidden;
+  border-radius:20px;
+  background:rgba(255,214,226,.5);
+}
+
+.fallingHeart{
+  position:absolute;
+  top:-45px;
+  background:none;
+  font-size:30px;
+  transition:top 2.4s linear;
+}
+
+.input{
+  padding:12px;
+  width:160px;
+  border:2px solid #ffb0c5;
+  border-radius:15px;
+  text-align:center;
+  font-size:17px;
+  outline:none;
+}
+
+.hiddenGrid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+  margin:20px 0;
+}
+
+.hiddenGrid button{
+  min-height:55px;
+  border-radius:12px;
+  background:#ffd5e0;
+  font-size:25px;
+}
+
+#musicBtn{
+  position:fixed;
+  right:16px;
+  bottom:16px;
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  background:#ff4f81;
+  color:white;
+  font-size:21px;
+  z-index:10000;
+}
+
+.floating{
+  position:fixed;
+  bottom:-40px;
+  pointer-events:none;
+  z-index:2;
+  animation:floatUp linear forwards;
+}
+
+.firework{
+  position:fixed;
+  pointer-events:none;
+  z-index:9999;
+  font-size:22px;
+}
+
+@keyframes beat{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.15)}
+}
+
+@keyframes floatUp{
+  from{
+    transform:translateY(0) rotate(0);
+    opacity:.8;
+  }
+  to{
+    transform:translateY(-110vh) rotate(360deg);
+    opacity:0;
+  }
+}
+
+@keyframes pop{
+  0%{transform:scale(.2);opacity:0}
+  70%{transform:scale(1.2);opacity:1}
+  100%{transform:scale(1);opacity:1}
+}
+
+.pop{
+  animation:pop .6s ease;
+}
+</style>
+</head>
+
+<body>
+
+<button id="musicBtn">🎵</button>
+
+<!-- MUSIC FILE -->
+<audio id="bgMusic" loop preload="auto">
+  <source src="Ajab_Prem_Ki_Ghazab_Kahani,_2009___Attitude_bio_for_instagram,_Vintage_bollywood_aesthetic,_Old_bollywood_songs.mp4" type="video/mp4">
+</audio>
+
+<div class="page">
+  <div class="card">
+
+    <div class="top" id="gameNumber"></div>
+
+    <div class="progress">
+      <div class="progressBar" id="progressBar"></div>
+    </div>
+
+    <div id="gameArea"></div>
+
+  </div>
+</div>
+
+<script>
+
+/* ==========================================
+   LOVE GAME — COMPLETE SINGLE FILE
+   ========================================== */
+
+const gameArea =
+  document.getElementById("gameArea");
+
+const gameNumber =
+  document.getElementById("gameNumber");
+
+const progressBar =
+  document.getElementById("progressBar");
+
+const music =
+  document.getElementById("bgMusic");
+
+const musicBtn =
+  document.getElementById("musicBtn");
+
+let currentGame = 0;
+let score = 0;
+
+
+/* ==========================================
+   MUSIC
+   ========================================== */
+
+function playMusic(){
+
+  music.volume = 0.65;
+
+  music.play().then(()=>{
+
+    musicBtn.innerText = "🔊";
+
+  }).catch(()=>{
+
+    musicBtn.innerText = "🎵";
+
+  });
+}
+
+musicBtn.onclick = function(){
+
+  if(music.paused){
+
+    playMusic();
+
+  }else{
+
+    music.pause();
+    musicBtn.innerText = "🔇";
+
+  }
+
+};
+
+
+/* ==========================================
+   FLOATING HEARTS
+   ========================================== */
+
+function floatingHeart(){
+
+  const h =
+    document.createElement("div");
+
+  h.className = "floating";
+
+  const hearts = [
+    "❤️","💗","💕","💖","💘"
+  ];
+
+  h.innerText =
+    hearts[
+      Math.floor(Math.random()*hearts.length)
+    ];
+
+  h.style.left =
+    Math.random()*100 + "%";
+
+  h.style.fontSize =
+    15 + Math.random()*20 + "px";
+
+  h.style.animationDuration =
+    5 + Math.random()*5 + "s";
+
+  document.body.appendChild(h);
+
+  setTimeout(()=>{
+    h.remove();
+  },10000);
+}
+
+setInterval(floatingHeart,900);
+
+
+/* ==========================================
+   UPDATE HEADER
+   ========================================== */
+
+function updateHeader(){
+
+  if(currentGame === 0){
+
+    gameNumber.innerText = "";
+
+    progressBar.style.width = "0%";
+
+    return;
+  }
+
+  gameNumber.innerText =
+    "GAME " + currentGame + " / 8";
+
+  progressBar.style.width =
+    ((currentGame / 8) * 100) + "%";
+}
+
+
+/* ==========================================
+   INTRO
+   ========================================== */
+
+function intro(){
+
+  currentGame = 0;
+
+  updateHeader();
+
+  gameArea.innerHTML = `
+
+    <div class="pop">
+
+      <div class="main-heart">
+        ❤️
+      </div>
+
+      <h1>
+        Are You Ready?
+      </h1>
+
+      <p>
+        I made something special for you... 💕
+        <br><br>
+        But first, you have to complete
+        <strong>8 little games</strong>.
+        <br><br>
+        Ready to begin?
+      </p>
+
+      <button class="btn"
+        onclick="startGame(1)">
+        I'm Ready ❤️
+      </button>
+
+    </div>
+  `;
+}
+
+
+/* ==========================================
+   START GAME
+   ========================================== */
+
+function startGame(number){
+
+  currentGame = number;
+
+  updateHeader();
+
+  if(number === 1) game1();
+  if(number === 2) game2();
+  if(number === 3) game3();
+  if(number === 4) game4();
+  if(number === 5) game5();
+  if(number === 6) game6();
+  if(number === 7) game7();
+  if(number === 8) game8();
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+  /* Start music after user's button tap */
+  playMusic();
+}
+
+
+/* ==========================================
+   GAME 1
+   ========================================== */
+
+function game1(){
+
+  score = 0;
+
+  gameArea.innerHTML = `
+
+    <h2>💗 Catch My Heart</h2>
+
+    <p>
+      Tap the heart 15 times!
+    </p>
+
+    <h3 id="score">
+      Hearts: 0 / 15
+    </h3>
+
+    <button
+      id="heartTarget"
+      class="gameButton">
+      ❤️
+    </button>
+
+    <p id="gameMessage"></p>
+  `;
+
+  const heart =
+    document.getElementById("heartTarget");
+
+  heart.onclick = function(){
+
+    score++;
+
+    document.getElementById("score")
+      .innerText =
+      "Hearts: " + score + " / 15";
+
+    heart.style.transform =
+      `translate(
+        ${Math.random()*120-60}px,
+        ${Math.random()*100-50}px
+      )`;
+
+    if(score >= 15){
+
+      document.getElementById("gameMessage")
+        .innerText =
+        "You caught my heart! ❤️";
+
+      setTimeout(()=>{
+        nextGame();
+      },900);
+    }
+  };
+}
+
+
+/* ==========================================
+   GAME 2
+   ========================================== */
+
+function game2(){
+
+  const symbols = [
+    "🤤","💗","💋","🫦",
+    "🤤","💗","💋","🫦"
+  ];
+
+  symbols.sort(
+    ()=>Math.random()-.5
+  );
+
+  gameArea.innerHTML = `
+
+    <h2>🧠 Love Memory</h2>
+
+    <p>
+      Find all 4 matching pairs.
+    </p>
+
+    <div class="memory"
+      id="memoryBoard">
+    </div>
+
+    <h3 id="matches">
+      Matches: 0 / 4
+    </h3>
+  `;
+
+  const board =
+    document.getElementById("memoryBoard");
+
+  let first = null;
+  let second = null;
+  let locked = false;
+  let matches = 0;
+
+  symbols.forEach(symbol=>{
+
+    const card =
+      document.createElement("button");
+
+    card.innerText = "❓";
+
+    card.dataset.value = symbol;
+
+    card.onclick = function(){
+
+      if(
+        locked ||
+        card === first ||
+        card.dataset.done
+      ) return;
+
+      card.innerText = symbol;
+
+      if(!first){
+
+        first = card;
+        return;
+      }
+
+      second = card;
+      locked = true;
+
+      if(
+        first.dataset.value ===
+        second.dataset.value
+      ){
+
+        first.dataset.done = "1";
+        second.dataset.done = "1";
+
+        matches++;
+
+        document.getElementById("matches")
+          .innerText =
+          "Matches: " + matches + " / 4";
+
+        first = null;
+        second = null;
+        locked = false;
+
+        if(matches === 4){
+
+          setTimeout(()=>{
+            nextGame();
+          },900);
+        }
+
+      }else{
+
+        setTimeout(()=>{
+
+          first.innerText = "❓";
+          second.innerText = "❓";
+
+          first = null;
+          second = null;
+          locked = false;
+
+        },700);
+      }
+    };
+
+    board.appendChild(card);
+  });
+}
+
+
+/* ==========================================
+   GAME 3
+   ========================================== */
+
+function game3(){
+
+  score = 0;
+
+  gameArea.innerHTML = `
+
+    <h2>💞 Catch My Love</h2>
+
+    <p>
+      Catch 12 falling hearts!
+    </p>
+
+    <h3 id="catchScore">
+      Caught: 0 / 12
+    </h3>
+
+    <div class="catchArea"
+      id="catchArea">
+    </div>
+  `;
+
+  const area =
+    document.getElementById("catchArea");
+
+  const timer =
+    setInterval(()=>{
+
+      if(score >= 12){
+
+        clearInterval(timer);
+        return;
+      }
+
+      const heart =
+        document.createElement("button");
+
+      heart.innerText = "❤️";
+      heart.className = "fallingHeart";
+
+      heart.style.left =
+        Math.random()*85 + "%";
+
+      area.appendChild(heart);
+
+      setTimeout(()=>{
+        heart.style.top = "320px";
+      },50);
+
+      heart.onclick = function(){
+
+        score++;
+
+        document.getElementById("catchScore")
+          .innerText =
+          "Caught: " + score + " / 12";
+
+        heart.remove();
+
+        if(score >= 12){
+
+          clearInterval(timer);
+
+          setTimeout(()=>{
+            nextGame();
+          },700);
+        }
+      };
+
+      setTimeout(()=>{
+        if(heart.parentNode){
+          heart.remove();
+        }
+      },2800);
+
+    },600);
+}
+
+
+/* ==========================================
+   GAME 4
+   ========================================== */
+
+function game4(){
+
+  gameArea.innerHTML = `
+
+    <h2>🔐 Crack The Love Code</h2>
+
+    <p>
+      Solve the secret code:
+    </p>
+
+    <h1>
+      ❤️ + ❤️ + ❤️ = ?
+    </h1>
+
+    <input
+      class="input"
+      id="answer"
+      type="number"
+      placeholder="Answer">
+
+    <br>
+
+    <button class="btn"
+      onclick="checkCode()">
+      Unlock ❤️
+    </button>
+
+    <p id="codeMessage"></p>
+  `;
+}
+
+
+function checkCode(){
+
+  const answer =
+    document.getElementById("answer").value;
+
+  const message =
+    document.getElementById("codeMessage");
+
+  if(answer === "3"){
+
+    message.innerText =
+      "Correct! You unlocked my heart 🔓❤️";
+
+    setTimeout(()=>{
+      nextGame();
+    },900);
+
+  }else{
+
+    message.innerText =
+      "Wrong code 😭 Try again!";
+  }
+}
+
+
+/* ==========================================
+   GAME 5
+   ========================================== */
+
+function game5(){
+
+  gameArea.innerHTML = `
+
+    <h2>🎲 Love Dice</h2>
+
+    <p>
+      Roll the dice!
+    </p>
+
+    <div id="dice"
+      style="font-size:85px">
+      🎲
+    </div>
+
+    <button class="btn"
+      onclick="rollDice()">
+      Roll ❤️
+    </button>
+
+    <p id="diceResult"></p>
+  `;
+}
+
+
+function rollDice(){
+
+  const number =
+    Math.floor(Math.random()*6)+1;
+
+  const faces = [
+    "⚀","⚁","⚂",
+    "⚃","⚄","⚅"
+  ];
+
+  document.getElementById("dice")
+    .innerText =
+    faces[number-1];
+
+  const challenges = [
+
+    "Give me your biggest smile 😊",
+
+    "Think of your favourite memory ❤️",
+
+    "Send a virtual hug 🤗",
+
+    "Say I LOVE YOU ❤️",
+
+    "Think of one thing you love about us 💕",
+
+    "You get unlimited love today! 👑❤️"
+
+  ];
+
+  document.getElementById("diceResult")
+    .innerText =
+    challenges[number-1];
+
+  setTimeout(()=>{
+    nextGame();
+  },1800);
+}
+
+
+/* ==========================================
+   GAME 6
+   ========================================== */
+
+function game6(){
+
+  gameArea.innerHTML = `
+
+    <h2>💌 Hidden Hearts</h2>
+
+    <p>
+      Find all 5 hidden hearts!
+    </p>
+
+    <div class="hiddenGrid"
+      id="hiddenGrid">
+    </div>
+
+    <h3 id="hiddenScore">
+      Found: 0 / 5
+    </h3>
+  `;
+
+  const grid =
+    document.getElementById("hiddenGrid");
+
+  let found = 0;
+
+  const positions =
+    [0,3,7,11,14];
+
+  for(let i=0;i<15;i++){
+
+    const button =
+      document.createElement("button");
+
+    button.innerText = "🌸";
+
+    button.dataset.heart =
+      positions.includes(i)
+      ? "yes"
+      : "no";
+
+    button.onclick = function(){
+
+      if(button.disabled) return;
+
+      button.disabled = true;
+
+      if(button.dataset.heart === "yes"){
+
+        button.innerText = "❤️";
+
+        found++;
+
+        document.getElementById("hiddenScore")
+          .innerText =
+          "Found: " + found + " / 5";
+
+        if(found === 5){
+
+          setTimeout(()=>{
+            nextGame();
+          },900);
+        }
+
+      }else{
+
+        button.innerText = "🥲";
+      }
+    };
+
+    grid.appendChild(button);
+  }
+}
+
+
+/* ==========================================
+   GAME 7
+   ========================================== */
+
+function game7(){
+
+  gameArea.innerHTML = `
+
+    <h2>🎂 Make A Wish</h2>
+
+    <div style="
+      font-size:100px;
+      margin:20px">
+      🎂
+    </div>
+
+    <p id="wishText">
+      Make a wish and blow the candles! 🕯️
+    </p>
+
+    <button class="btn"
+      onclick="blowCandles()">
+      Blow Candles 🕯️
+    </button>
+  `;
+}
+
+
+function blowCandles(){
+
+  document.getElementById("wishText")
+    .innerHTML =
+    "✨ Wish made! ✨<br><br>" +
+    "I hope your wish comes true ❤️";
+
+  setTimeout(()=>{
+    nextGame();
+  },1600);
+}
+
+
+/* ==========================================
+   GAME 8 — FINAL
+   ========================================== */
+
+function game8(){
+
+  gameArea.innerHTML = `
+
+    <div class="pop">
+
+      <h2>🎆 One Last Surprise</h2>
+
+      <p>
+        You've reached the final game...
+        <br>
+        Are you ready?
+      </p>
+
+      <button class="btn"
+        onclick="finalSurprise()">
+        Open It ❤️
+      </button>
+
+      <div id="finalBox"></div>
+
+    </div>
+  `;
+}
+
+
+function finalSurprise(){
+
+  const box =
+    document.getElementById("finalBox");
+
+  box.innerHTML = `
+
+    <div class="pop">
+
+      <div style="
+        font-size:70px;
+        margin-top:25px">
+        🎆
+      </div>
+
+      <h1>
+        I LOVE YOU, SHRYSS ❤️
+      </h1>
+
+      <p>
+        You actually completed
+        all 8 games! 🥹
+        <br><br>
+        Thank you for staying
+        until the very end.
+        <br><br>
+        You deserve all the love,
+        happiness and beautiful
+        moments in the world. 💕
+      </p>
+
+      <div style="
+        font-size:45px">
+        ❤️ 💖 ❤️
+      </div>
+
+      <button class="btn"
+        onclick="restart()">
+        Play Again 🔄
+      </button>
+
+    </div>
+  `;
+
+  fireworks();
+}
+
+
+/* ==========================================
+   NEXT GAME
+   ========================================== */
+
+function nextGame(){
+
+  if(currentGame < 8){
+
+    currentGame++;
+
+    startGame(currentGame);
+
+  }
+}
+
+
+/* ==========================================
+   FIREWORKS
+   ========================================== */
+
+function fireworks(){
+
+  for(let burst=0;burst<10;burst++){
+
+    setTimeout(()=>{
+
+      const x =
+        Math.random()*window.innerWidth;
+
+      const y =
+        80 +
+        Math.random()*
+        (window.innerHeight*.55);
+
+      for(let i=0;i<20;i++){
+
+        const particle =
+          document.createElement("div");
+
+        particle.className =
+          "firework";
+
+        particle.innerText =
+          ["✨","💖","⭐","❤️"]
+          [Math.floor(Math.random()*4)];
+
+        particle.style.left =
+          x + "px";
+
+        particle.style.top =
+          y + "px";
+
+        document.body.appendChild(
+          particle
+        );
+
+        const angle =
+          Math.random()*Math.PI*2;
+
+        const distance =
+          60 + Math.random()*130;
+
+        const dx =
+          Math.cos(angle)*distance;
+
+        const dy =
+          Math.sin(angle)*distance;
+
+        particle.animate(
+          [
+            {
+              transform:
+                "translate(0,0) scale(.5)",
+              opacity:1
+            },
+            {
+              transform:
+                `translate(${dx}px,${dy}px) scale(1.2)`,
+              opacity:0
+            }
+          ],
+          {
+            duration:1200,
+            easing:"ease-out"
+          }
+        );
+
+        setTimeout(()=>{
+          particle.remove();
+        },1200);
+      }
+
+    },burst*300);
+  }
+}
+
+
+/* ==========================================
+   RESTART
+   ========================================== */
+
+function restart(){
+
+  intro();
+
+}
+
+
+/* ==========================================
+   START
+   ========================================== */
+
+intro();
+
+</script>
+
+</body>
+</html>
